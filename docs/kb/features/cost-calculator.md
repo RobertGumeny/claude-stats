@@ -6,6 +6,8 @@ tags: [cost-calculation, pricing, claude, tokens]
 related_articles:
   - docs/kb/patterns/jsonl-streaming-parser.md
   - docs/kb/architecture/typescript-type-system.md
+  - docs/kb/features/api-endpoints.md
+  - docs/kb/infrastructure/vitest-backend-testing.md
 ---
 
 # Claude Sonnet 4.5 Cost Calculator
