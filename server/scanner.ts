@@ -277,3 +277,78 @@ export async function scanAllProjects(): Promise<ScanResult> {
     };
   }
 }
+
+/**
+ * Result type for project-specific session scan
+ */
+export interface ProjectSessionsResult {
+  success: true;
+  sessions: Session[];
+  projectName: string;
+}
+
+export interface ProjectNotFoundResult {
+  success: false;
+  error: string;
+  projectName: string;
+}
+
+export type ProjectSessionsScanResult = ProjectSessionsResult | ProjectNotFoundResult;
+
+/**
+ * Get all sessions for a specific project by name
+ * @param projectName - Name of the project directory
+ * @returns Promise resolving to sessions array or error
+ */
+export async function getProjectSessions(projectName: string): Promise<ProjectSessionsScanResult> {
+  const projectsPath = getClaudeProjectsPath();
+  const projectPath = join(projectsPath, projectName);
+
+  try {
+    // Check if the project directory exists
+    const dirStats = await stat(projectPath);
+
+    if (!dirStats.isDirectory()) {
+      return {
+        success: false,
+        error: `Project '${projectName}' exists but is not a directory`,
+        projectName
+      };
+    }
+  } catch (error) {
+    // Project directory doesn't exist
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+      return {
+        success: false,
+        error: `Project '${projectName}' not found`,
+        projectName
+      };
+    }
+
+    // Other errors (permissions, etc.)
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      error: `Unable to access project '${projectName}': ${errorMessage}`,
+      projectName
+    };
+  }
+
+  try {
+    // Scan the specific project
+    const project = await scanProject(projectPath, projectName);
+
+    return {
+      success: true,
+      sessions: project.sessions,
+      projectName
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      error: `Error scanning project '${projectName}': ${errorMessage}`,
+      projectName
+    };
+  }
+}

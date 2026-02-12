@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { scanAllProjects } from './scanner.js';
+import { scanAllProjects, getProjectSessions } from './scanner.js';
 
 const app = express();
 const PORT = 3001;
@@ -39,6 +39,47 @@ app.get('/api/projects', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/sessions/:projectName
+ * Returns all sessions for a specific project with summary statistics
+ * Includes: totalCost, messageCount, sidechainCount, sidechainPercentage per session
+ * Returns 404 if project name not found
+ */
+app.get('/api/sessions/:projectName', async (req: Request, res: Response) => {
+  try {
+    const { projectName } = req.params;
+
+    if (!projectName || !projectName.trim()) {
+      return res.status(400).json({
+        error: 'Project name is required',
+        sessions: []
+      });
+    }
+
+    const result = await getProjectSessions(projectName);
+
+    if (!result.success) {
+      return res.status(404).json({
+        error: result.error,
+        projectName: result.projectName,
+        sessions: []
+      });
+    }
+
+    res.json({
+      projectName: result.projectName,
+      sessions: result.sessions,
+      totalSessions: result.sessions.length
+    });
+  } catch (error) {
+    console.error('Error in /api/sessions/:projectName:', error);
+    res.status(500).json({
+      error: 'Internal server error while fetching project sessions',
+      sessions: []
+    });
+  }
+});
+
+/**
  * GET /api/health
  * Simple health check endpoint
  */
@@ -53,5 +94,6 @@ app.listen(PORT, () => {
   console.log(`Claude Stats API server running on http://localhost:${PORT}`);
   console.log(`Available endpoints:`);
   console.log(`  - GET /api/projects - List all Claude Code projects with aggregated data`);
+  console.log(`  - GET /api/sessions/:projectName - Get all sessions for a specific project`);
   console.log(`  - GET /api/health - Health check`);
 });
