@@ -8,5 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- Set up Vite + React 19 + TypeScript project with Tailwind CSS 4 and folder structure (src/components, src/utils, src/types, server/)
 
 - Initial project setup with orchestrator framework
