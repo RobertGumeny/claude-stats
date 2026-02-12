@@ -1,22 +1,27 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Session } from '../types';
 import { SessionCard } from './SessionCard';
+import { Breadcrumb } from './Breadcrumb';
 
 interface SessionListProps {
   projectName: string;
-  onSessionClick: (sessionId: string) => void;
-  onBack: () => void;
 }
 
 type SortOption = 'recent' | 'expensive' | 'longest';
 
 const API_BASE_URL = 'http://localhost:3001';
 
-export function SessionList({ projectName, onSessionClick, onBack }: SessionListProps) {
+export function SessionList({ projectName }: SessionListProps) {
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('recent');
+
+  const handleSessionClick = (sessionId: string) => {
+    navigate(`/session/${encodeURIComponent(projectName)}/${encodeURIComponent(sessionId)}`);
+  };
 
   // Fetch sessions for the project
   useEffect(() => {
@@ -75,18 +80,13 @@ export function SessionList({ projectName, onSessionClick, onBack }: SessionList
 
   return (
     <div>
-      {/* Breadcrumb and Back Button */}
-      <div className="mb-6">
-        <button
-          onClick={onBack}
-          className="text-accent-primary hover:text-blue-400 transition-colors mb-2 flex items-center gap-2"
-        >
-          ← Back to Projects
-        </button>
-        <div className="text-text-tertiary text-sm">
-          Projects &gt; <span className="text-text-primary font-semibold">{projectName}</span>
-        </div>
-      </div>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: projectName }
+        ]}
+      />
 
       {/* Header with Sort Options */}
       <div className="mb-6 flex justify-between items-center">
@@ -143,7 +143,7 @@ export function SessionList({ projectName, onSessionClick, onBack }: SessionList
             <SessionCard
               key={session.sessionId}
               session={session}
-              onClick={() => onSessionClick(session.sessionId)}
+              onClick={() => handleSessionClick(session.sessionId)}
             />
           ))}
         </div>

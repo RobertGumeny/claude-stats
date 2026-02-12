@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Project } from '../types';
 import { ProjectCard } from './ProjectCard';
 
 interface ProjectListProps {
   projects: Project[];
-  onProjectClick: (projectName: string) => void;
 }
 
 type SortOption = 'cost' | 'recent' | 'alphabetical' | 'session-count';
@@ -14,9 +14,14 @@ type SortOption = 'cost' | 'recent' | 'alphabetical' | 'session-count';
  * Displays all projects with search bar and sorting options
  * PRD: Most expensive (default), Most recent, Alphabetical
  */
-export function ProjectList({ projects, onProjectClick }: ProjectListProps) {
+export function ProjectList({ projects }: ProjectListProps) {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('cost');
+
+  const handleProjectClick = (projectName: string) => {
+    navigate(`/project/${encodeURIComponent(projectName)}`);
+  };
 
   // Real-time filtering based on search query
   const filteredProjects = useMemo(() => {
@@ -103,7 +108,7 @@ export function ProjectList({ projects, onProjectClick }: ProjectListProps) {
             <ProjectCard
               key={project.name}
               project={project}
-              onClick={() => onProjectClick(project.name)}
+              onClick={() => handleProjectClick(project.name)}
             />
           ))}
         </div>

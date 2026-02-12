@@ -3,16 +3,16 @@ import { SessionDetail as SessionDetailType } from '../types';
 import { SummaryCard } from './SummaryCard';
 import { MessageTable } from './MessageTable';
 import { truncateSessionId } from '../utils/formatters';
+import { Breadcrumb } from './Breadcrumb';
 
 interface SessionDetailProps {
   projectName: string;
   sessionId: string;
-  onBack: () => void;
 }
 
 const API_BASE_URL = 'http://localhost:3001';
 
-export function SessionDetail({ projectName, sessionId, onBack }: SessionDetailProps) {
+export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
   const [sessionDetail, setSessionDetail] = useState<SessionDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,21 +59,14 @@ export function SessionDetail({ projectName, sessionId, onBack }: SessionDetailP
 
   return (
     <div>
-      {/* Breadcrumb and Back Button */}
-      <div className="mb-6">
-        <button
-          onClick={onBack}
-          className="text-accent-primary hover:text-blue-400 transition-colors mb-2 flex items-center gap-2"
-        >
-          ← Back to Sessions
-        </button>
-        <div className="text-text-tertiary text-sm">
-          Projects &gt; <span className="text-text-secondary">{projectName}</span> &gt;{' '}
-          <span className="text-text-primary font-semibold">
-            {truncateSessionId(sessionId, 12)}
-          </span>
-        </div>
-      </div>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: projectName, path: `/project/${encodeURIComponent(projectName)}` },
+          { label: truncateSessionId(sessionId, 12) }
+        ]}
+      />
 
       {/* Header */}
       <div className="mb-6">

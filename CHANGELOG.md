@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- feat: EPIC-3-004 - Implement React Router navigation with breadcrumbs and URL state preservation
 - feat(ui): implement SessionDetail view with summary card, message table, and expandable rows
 - feat: EPIC-3-002 - Add Session List view with session cards, sorting, and navigation
 - feat: implement Project List view with search, sort, and project cards (EPIC-3-001)
