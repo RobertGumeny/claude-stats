@@ -38,6 +38,49 @@ app.get('/api/projects', async (req, res) => {
 });
 
 /**
+ * GET /api/sessions/:projectName
+ * Returns list of all sessions for a specific project
+ */
+app.get('/api/sessions/:projectName', async (req, res) => {
+  try {
+    const { projectName } = req.params;
+    const result = await scanAllProjects();
+
+    if (!result.success) {
+      return res.status(404).json({
+        error: result.error,
+        sessions: []
+      });
+    }
+
+    // Find the requested project
+    const project = result.projects.find(p => p.name === projectName);
+
+    if (!project) {
+      return res.status(404).json({
+        error: `Project "${projectName}" not found`,
+        sessions: []
+      });
+    }
+
+    res.json({
+      projectName: project.name,
+      sessions: project.sessions,
+      metadata: {
+        totalSessions: project.sessions.length,
+        totalCost: project.totalCost
+      }
+    });
+  } catch (error) {
+    console.error('Error in /api/sessions/:projectName:', error);
+    res.status(500).json({
+      error: 'Internal server error while fetching sessions',
+      sessions: []
+    });
+  }
+});
+
+/**
  * GET /api/health
  * Simple health check endpoint
  */
@@ -52,5 +95,6 @@ app.listen(PORT, () => {
   console.log(`Claude Stats API server running on http://localhost:${PORT}`);
   console.log(`Available endpoints:`);
   console.log(`  - GET /api/projects - List all Claude Code projects`);
+  console.log(`  - GET /api/sessions/:projectName - List all sessions for a project`);
   console.log(`  - GET /api/health - Health check`);
 });
