@@ -7,6 +7,8 @@ related_articles:
   - docs/kb/patterns/graceful-error-handling.md
   - docs/kb/patterns/jsonl-streaming-parser.md
   - docs/kb/dependencies/express.md
+  - docs/kb/features/api-endpoints.md
+  - docs/kb/patterns/in-memory-caching.md
 ---
 
 # Claude Code Filesystem Scanner

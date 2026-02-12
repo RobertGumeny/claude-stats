@@ -6,6 +6,8 @@ tags: [nodejs, streaming, jsonl, parser]
 related_articles:
   - docs/kb/patterns/graceful-error-handling.md
   - docs/kb/features/filesystem-scanner.md
+  - docs/kb/infrastructure/structured-logging.md
+  - docs/kb/infrastructure/vitest-backend-testing.md
 ---
 
 # JSONL Streaming Parser Pattern

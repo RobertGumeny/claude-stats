@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- Add comprehensive unit testing with Vitest for back-end utilities (scanner, parser, cost calculator)
+- feat: Add comprehensive error handling layer with consistent error responses, graceful degradation for corrupted files, and structured logging
+- feat: EPIC-2-005 - Add POST /api/refresh endpoint with in-memory caching and cache invalidation
+- Implemented GET /api/session-detail/:projectName/:sessionId endpoint that returns full message-level breakdown for a single session with individual message costs
+- Implemented GET /api/sessions/:projectName endpoint that returns all sessions for a specific project with summary statistics
+- Implemented Express server with GET /api/projects endpoint that scans all projects and returns aggregated summary data including totalCost and lastActivity
+- feat(backend): convert all backend code to TypeScript with comprehensive type definitions
 - feat: Define TypeScript interfaces for Project, Session, SessionDetail, and Message types
 - feat: EPIC-1-004 - Implement cost calculator utility with accurate Claude Sonnet 4.5 pricing
 - feat(parser): implement robust JSONL parser with error handling

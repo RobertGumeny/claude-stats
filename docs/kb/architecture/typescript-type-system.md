@@ -7,15 +7,18 @@ related_articles:
   - docs/kb/features/cost-calculator.md
   - docs/kb/patterns/jsonl-streaming-parser.md
   - docs/kb/infrastructure/vite-react-typescript-setup.md
+  - docs/kb/infrastructure/backend-typescript-configuration.md
 ---
 
 # TypeScript Type System and Interfaces
 
 ## Overview
 
-The project defines comprehensive TypeScript interfaces for all data structures, matching the PRD data model specification exactly. All types are exported from `src/types/index.ts` for consistent usage across components and utilities.
+The project defines comprehensive TypeScript interfaces for all data structures, matching the PRD data model specification exactly. Frontend types are exported from `src/types/index.ts`, while backend modules define their own internal types in `server/*.ts` files for separation of concerns.
 
 ## Implementation
+
+### Frontend Types
 
 **Core Type Definitions (src/types/index.ts):**
 ```typescript
@@ -63,6 +66,25 @@ export interface Project {
 }
 ```
 
+### Backend Types
+
+The backend defines separate but compatible type interfaces in individual server modules:
+
+**Scanner Types (server/scanner.ts):**
+```typescript
+interface SessionFile { filename: string; sessionId: string; ... }
+interface Project { name: string; sessions: Session[]; ... }
+interface ScanResult { success: boolean; projects?: Project[]; error?: string; }
+```
+
+**Parser Types (server/parser.ts):**
+```typescript
+interface LogMessage { message: { id: string; usage: TokenUsage; ... }; ... }
+interface ParseFileResult { success: boolean; messages?: MessageData[]; ... }
+```
+
+**Separation Rationale**: Backend types include additional internal fields (file paths, parse statistics, error details) not exposed to frontend. Keeps API surface clean.
+
 ## Key Decisions
 
 **Separate TokenUsage Interface**: Created dedicated interface for token usage rather than inlining in `Message`. Improves reusability and clarity.
@@ -76,6 +98,8 @@ export interface Project {
 **ISO Timestamp Documentation**: Added inline comments clarifying that timestamp fields expect ISO 8601 format strings (`2026-02-12T18:30:00Z`).
 
 **No `any` Types**: All types are fully defined with no `any` escape hatches. Strict mode enforces this.
+
+**Backend Type Separation**: Backend uses separate type definitions in server modules instead of importing from `src/types/`. This prevents module resolution issues during compilation and keeps concerns separated.
 
 ## Usage Example
 
@@ -120,6 +144,7 @@ const totalMessages = project.sessions.reduce((sum, s) => sum + s.messageCount, 
 
 ## Related Topics
 
-See [Cost Calculator](../features/cost-calculator.md) for `TokenUsage` and `Message` usage.
-See [JSONL Streaming Parser](../patterns/jsonl-streaming-parser.md) for `Message` construction.
-See [Vite + React + TypeScript Setup](../infrastructure/vite-react-typescript-setup.md) for TypeScript configuration.
+- See [Cost Calculator](../features/cost-calculator.md) for `TokenUsage` and `Message` usage
+- See [JSONL Streaming Parser](../patterns/jsonl-streaming-parser.md) for `Message` construction
+- See [Vite + React + TypeScript Setup](../infrastructure/vite-react-typescript-setup.md) for frontend TypeScript configuration
+- See [Backend TypeScript Configuration](../infrastructure/backend-typescript-configuration.md) for server-side TypeScript setup
