@@ -11,8 +11,8 @@ current_epic:
   completed_at: null # Set when epic completes
 # Current task being worked on
 active_task:
-  type: "feature" # feature | bugfix | documentation | manual_review
-  id: "EPIC-1-005" # Task identifier (e.g., EPIC-1-001)
+  type: "documentation" # feature | bugfix | documentation | manual_review
+  id: "KB_UPDATE" # Task identifier (e.g., EPIC-1-001)
   attempts: 1 # Number of attempts on this task
 # Next task in queue
 next_task:
