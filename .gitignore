@@ -1,0 +1,40 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+go.sum
+
+# Build output
+dist/
+build/
+out/
+target/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Transient logs
+logs/ACTIVE_BUG.md
+logs/ACTIVE_FAILURE.md
+
+# Orchestrator
+orchestrator
+agent_loop
+tasks.yaml
+backlog.yaml
