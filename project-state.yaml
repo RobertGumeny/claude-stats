@@ -13,20 +13,20 @@ current_epic:
 
 active_task:
   type: "feature" # feature | bugfix | documentation | manual_review
-  id: "EPIC-3-004" # Task identifier (e.g., EPIC-1-001)
+  id: "EPIC-3-005" # Task identifier (e.g., EPIC-1-001)
   attempts: 1 # Number of attempts on this task
 # Next task in queue
 
 next_task:
-  type: feature # Automatically managed by orchestrator
-  id: EPIC-3-005 # Automatically managed by orchestrator
+  type: null # Automatically managed by orchestrator
+  id: null # Automatically managed by orchestrator
 # Knowledge base synthesis (set to false to skip KB generation after epic completes)
 
 kb_enabled: true
 # Metrics tracking (automatically managed - do not edit)
 
 metrics:
-  total_tasks_completed: 16
+  total_tasks_completed: 17
   total_duration_seconds: 0
   tasks:
     - task_id: EPIC-1-001
@@ -93,3 +93,7 @@ metrics:
       outcome: success
       duration_seconds: 259
       completed_at: "2026-02-12T22:01:04Z"
+    - task_id: EPIC-3-005
+      outcome: success
+      duration_seconds: 168
+      completed_at: "2026-02-12T22:04:02Z"

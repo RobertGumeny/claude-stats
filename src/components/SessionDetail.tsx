@@ -80,7 +80,7 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
       {loading && (
         <div className="flex justify-center items-center py-12">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-primary mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400 mx-auto mb-4"></div>
             <p className="text-text-tertiary">Loading session details...</p>
           </div>
         </div>
@@ -89,8 +89,11 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
       {/* Error State */}
       {!loading && error && (
         <div className="bg-background-secondary border border-accent-warning rounded-lg p-6">
-          <h3 className="text-accent-warning font-semibold mb-2">Error Loading Session</h3>
-          <p className="text-text-secondary">{error}</p>
+          <h3 className="text-accent-warning font-semibold mb-2">Failed to load session</h3>
+          <p className="text-text-secondary">Failed to load session details. Try refreshing the page.</p>
+          <p className="text-text-tertiary text-sm mt-2">
+            Make sure the API server is running on port 3001.
+          </p>
         </div>
       )}
 

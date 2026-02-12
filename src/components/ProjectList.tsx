@@ -97,10 +97,20 @@ export function ProjectList({ projects }: ProjectListProps) {
 
       {/* Project Cards Grid */}
       {sortedProjects.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="bg-background-secondary border border-border-primary rounded-lg p-12 text-center">
+          <div className="inline-block mb-4 text-text-tertiary">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+          </div>
           <p className="text-text-tertiary text-lg">
             {searchQuery ? 'No projects match your search' : 'No projects found'}
           </p>
+          {!searchQuery && (
+            <p className="text-text-tertiary text-sm mt-2">
+              No Claude Code projects detected. Start a session to see it here.
+            </p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

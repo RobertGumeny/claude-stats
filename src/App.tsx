@@ -127,7 +127,7 @@ function ProjectListPage({ projects, loading, error, totalCost, onRefresh }: Pro
           {loading && (
             <div className="flex justify-center items-center py-12">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-primary mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400 mx-auto mb-4"></div>
                 <p className="text-text-tertiary">Scanning Claude projects...</p>
               </div>
             </div>
@@ -136,8 +136,15 @@ function ProjectListPage({ projects, loading, error, totalCost, onRefresh }: Pro
           {/* Error State */}
           {!loading && error && (
             <div className="bg-background-secondary border border-accent-warning rounded-lg p-6">
-              <h3 className="text-accent-warning font-semibold mb-2">Error Loading Projects</h3>
-              <p className="text-text-secondary whitespace-pre-line">{error}</p>
+              <h3 className="text-accent-warning font-semibold mb-2">Failed to load projects</h3>
+              <p className="text-text-secondary whitespace-pre-line">
+                {error.includes('Failed to connect') || error.includes('API returned')
+                  ? 'Failed to load projects. Try refreshing the page.'
+                  : error}
+              </p>
+              <p className="text-text-tertiary text-sm mt-2">
+                Make sure the API server is running on port 3001.
+              </p>
             </div>
           )}
 
