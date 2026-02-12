@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Project } from './types';
 import { ProjectList } from './components/ProjectList';
 import { SessionList } from './components/SessionList';
+import { SessionDetail } from './components/SessionDetail';
 
 const API_BASE_URL = 'http://localhost:3001';
 
@@ -165,19 +166,13 @@ function App() {
             />
           )}
 
-          {/* Session Detail View - Placeholder for EPIC-3-003 */}
-          {currentView === 'session-detail' && selectedSession && (
-            <div className="bg-background-secondary border border-border-primary rounded-lg p-6">
-              <button
-                onClick={handleBackToSessions}
-                className="text-accent-primary hover:text-blue-400 transition-colors mb-4"
-              >
-                ← Back to Sessions
-              </button>
-              <p className="text-text-secondary">
-                Session detail view for session "{selectedSession}" will be implemented in EPIC-3-003.
-              </p>
-            </div>
+          {/* Session Detail View */}
+          {currentView === 'session-detail' && selectedSession && selectedProject && (
+            <SessionDetail
+              projectName={selectedProject}
+              sessionId={selectedSession}
+              onBack={handleBackToSessions}
+            />
           )}
         </main>
       </div>

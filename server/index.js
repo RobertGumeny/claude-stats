@@ -81,6 +81,82 @@ app.get('/api/sessions/:projectName', async (req, res) => {
 });
 
 /**
+ * GET /api/session-detail/:projectName/:sessionId
+ * Returns detailed information for a specific session including all messages
+ */
+app.get('/api/session-detail/:projectName/:sessionId', async (req, res) => {
+  try {
+    const { projectName, sessionId } = req.params;
+    const result = await scanAllProjects();
+
+    if (!result.success) {
+      return res.status(404).json({
+        error: result.error,
+        sessionDetail: null
+      });
+    }
+
+    // Find the requested project
+    const project = result.projects.find(p => p.name === projectName);
+
+    if (!project) {
+      return res.status(404).json({
+        error: `Project "${projectName}" not found`,
+        sessionDetail: null
+      });
+    }
+
+    // Find the requested session
+    const session = project.sessions.find(s => s.sessionId === sessionId);
+
+    if (!session) {
+      return res.status(404).json({
+        error: `Session "${sessionId}" not found in project "${projectName}"`,
+        sessionDetail: null
+      });
+    }
+
+    // Import parser and cost calculator to get detailed messages
+    const { parseJsonlFile } = await import('./parser.js');
+    const { calculateMessageCost } = await import('./cost-calculator.js');
+    const { join } = await import('path');
+
+    // Parse the session file to get all messages with full details
+    const sessionFilePath = join(project.path, session.filename);
+    const parseResult = await parseJsonlFile(sessionFilePath);
+
+    if (!parseResult.success || !parseResult.messages) {
+      return res.status(500).json({
+        error: `Failed to parse session file: ${parseResult.error || 'Unknown error'}`,
+        sessionDetail: null
+      });
+    }
+
+    // Enrich messages with cost calculations
+    const messagesWithCost = parseResult.messages.map(msg => ({
+      ...msg,
+      cost: calculateMessageCost(msg.usage)
+    }));
+
+    // Build session detail response
+    const sessionDetail = {
+      ...session,
+      messages: messagesWithCost
+    };
+
+    res.json({
+      sessionDetail
+    });
+  } catch (error) {
+    console.error('Error in /api/session-detail/:projectName/:sessionId:', error);
+    res.status(500).json({
+      error: 'Internal server error while fetching session details',
+      sessionDetail: null
+    });
+  }
+});
+
+/**
  * GET /api/health
  * Simple health check endpoint
  */
@@ -96,5 +172,6 @@ app.listen(PORT, () => {
   console.log(`Available endpoints:`);
   console.log(`  - GET /api/projects - List all Claude Code projects`);
   console.log(`  - GET /api/sessions/:projectName - List all sessions for a project`);
+  console.log(`  - GET /api/session-detail/:projectName/:sessionId - Get detailed session info with messages`);
   console.log(`  - GET /api/health - Health check`);
 });
