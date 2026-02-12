@@ -1,5 +1,6 @@
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
+import { Logger } from './errorHandler.js';
 
 /**
  * Token usage information for a message
@@ -248,11 +249,16 @@ export async function parseJsonlFile(filePath: string): Promise<ParseFileResult>
           error: result.error,
           line: line.substring(0, 100) // First 100 chars for debugging
         });
-        console.warn(`[PARSER WARNING] ${result.error}`);
+        Logger.warn(`Malformed JSONL line in file`, {
+          filePath,
+          lineNumber,
+          error: result.error
+        });
       }
     });
 
     rl.on('error', (error: Error) => {
+      Logger.error('Failed to read JSONL file', error, { filePath });
       resolve({
         success: false,
         error: `Failed to read file: ${error.message}`,
@@ -261,6 +267,22 @@ export async function parseJsonlFile(filePath: string): Promise<ParseFileResult>
     });
 
     rl.on('close', () => {
+      // Log summary if there were errors
+      if (malformedLines > 0) {
+        Logger.warn(`Completed parsing with errors`, {
+          filePath,
+          totalLines,
+          successfulLines: messages.length,
+          malformedLines,
+          errorRate: `${((malformedLines / totalLines) * 100).toFixed(2)}%`
+        });
+      } else {
+        Logger.debug(`Successfully parsed JSONL file`, {
+          filePath,
+          messagesFound: messages.length
+        });
+      }
+
       resolve({
         success: true,
         messages,

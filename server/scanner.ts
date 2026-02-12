@@ -3,6 +3,7 @@ import { join, resolve } from 'path';
 import { homedir } from 'os';
 import { parseJsonlFile } from './parser.js';
 import { calculateMessageCost } from './costCalculator.js';
+import { Logger } from './errorHandler.js';
 
 /**
  * Represents a session file with its metadata
@@ -123,9 +124,9 @@ async function findJsonlFiles(dirPath: string, fileList: string[] = []): Promise
       }
     }
   } catch (error) {
-    // Silently skip directories we can't read (permissions, etc.)
+    // Log and skip directories we can't read (permissions, etc.)
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn(`Warning: Could not read directory ${dirPath}: ${errorMessage}`);
+    Logger.warn(`Could not read directory`, { dirPath, error: errorMessage });
   }
 
   return fileList;
@@ -140,9 +141,28 @@ async function parseSessionFile(filePath: string): Promise<Session | null> {
   try {
     const parseResult = await parseJsonlFile(filePath);
 
-    if (!parseResult.success || !parseResult.messages || parseResult.messages.length === 0) {
-      // Skip files that can't be parsed or have no messages
+    if (!parseResult.success) {
+      // File completely failed to parse - log error but don't crash
+      Logger.error('Failed to parse session file', new Error(parseResult.error), {
+        filePath
+      });
       return null;
+    }
+
+    if (!parseResult.messages || parseResult.messages.length === 0) {
+      // File has no valid messages - skip silently
+      Logger.debug('Session file has no valid messages', { filePath });
+      return null;
+    }
+
+    // Check if there were partial parse errors (some lines failed)
+    if (parseResult.errors && parseResult.errors.length > 0) {
+      Logger.warn('Session file has corrupted lines', {
+        filePath,
+        totalErrors: parseResult.errors.length,
+        validMessages: parseResult.messages.length,
+        errorRate: `${((parseResult.errors.length / parseResult.stats.totalLines) * 100).toFixed(2)}%`
+      });
     }
 
     const messages = parseResult.messages;
@@ -188,8 +208,8 @@ async function parseSessionFile(filePath: string): Promise<Session | null> {
       lastMessage
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn(`Warning: Could not parse session file ${filePath}: ${errorMessage}`);
+    // Gracefully handle unexpected errors during session file parsing
+    Logger.error('Unexpected error parsing session file', error, { filePath });
     return null;
   }
 }
