@@ -1,6 +1,8 @@
 import { readdir, stat } from 'fs/promises';
 import { join, resolve } from 'path';
 import { homedir } from 'os';
+import { parseJsonlFile } from './parser.js';
+import { calculateMessageCost } from './cost-calculator.js';
 
 /**
  * Get the path to the ~/.claude/projects directory
@@ -39,6 +41,78 @@ async function findJsonlFiles(dirPath, fileList = []) {
 }
 
 /**
+ * Process a single session file and extract metadata
+ * @param {string} filePath - Path to session JSONL file
+ * @returns {Promise<Object|null>} Session metadata or null if parsing fails
+ */
+async function processSessionFile(filePath) {
+  try {
+    const parseResult = await parseJsonlFile(filePath);
+
+    if (!parseResult.success || !parseResult.messages || parseResult.messages.length === 0) {
+      return null;
+    }
+
+    const messages = parseResult.messages;
+
+    // Calculate costs for each message
+    const messagesWithCost = messages.map(msg => ({
+      ...msg,
+      cost: calculateMessageCost(msg.usage)
+    }));
+
+    // Calculate session statistics
+    const totalCost = messagesWithCost.reduce((sum, msg) => sum + msg.cost, 0);
+    const sidechainMessages = messages.filter(msg => msg.isSidechain);
+    const sidechainCount = sidechainMessages.length;
+    const sidechainPercentage = messages.length > 0
+      ? Math.round((sidechainCount / messages.length) * 100)
+      : 0;
+
+    // Calculate total tokens
+    const totalTokens = messages.reduce((sum, msg) => {
+      const usage = msg.usage || {};
+      return sum +
+        (usage.input_tokens || 0) +
+        (usage.cache_creation_input_tokens || 0) +
+        (usage.cache_read_input_tokens || 0) +
+        (usage.output_tokens || 0);
+    }, 0);
+
+    // Get timestamps
+    const timestamps = messages
+      .map(msg => new Date(msg.timestamp).getTime())
+      .filter(ts => !isNaN(ts));
+
+    const firstMessage = timestamps.length > 0
+      ? new Date(Math.min(...timestamps)).toISOString()
+      : new Date().toISOString();
+
+    const lastMessage = timestamps.length > 0
+      ? new Date(Math.max(...timestamps)).toISOString()
+      : new Date().toISOString();
+
+    // Extract session ID from first message
+    const sessionId = messages[0]?.sessionId || 'unknown';
+
+    return {
+      filename: filePath.split(/[/\\]/).pop(),
+      sessionId,
+      messageCount: messages.length,
+      totalCost: Math.round(totalCost * 10000) / 10000,
+      sidechainCount,
+      sidechainPercentage,
+      totalTokens,
+      firstMessage,
+      lastMessage
+    };
+  } catch (error) {
+    console.warn(`Failed to process session file ${filePath}: ${error.message}`);
+    return null;
+  }
+}
+
+/**
  * Scan a single project directory and return metadata
  * @param {string} projectPath - Path to project directory
  * @param {string} projectName - Name of the project
@@ -47,14 +121,33 @@ async function findJsonlFiles(dirPath, fileList = []) {
 async function scanProject(projectPath, projectName) {
   const sessionFiles = await findJsonlFiles(projectPath);
 
+  // Process all session files in parallel
+  const sessionResults = await Promise.all(
+    sessionFiles.map(filePath => processSessionFile(filePath))
+  );
+
+  // Filter out failed sessions
+  const sessions = sessionResults.filter(session => session !== null);
+
+  // Calculate project-level statistics
+  const totalCost = sessions.reduce((sum, session) => sum + session.totalCost, 0);
+
+  // Get most recent activity timestamp
+  const allTimestamps = sessions
+    .map(session => new Date(session.lastMessage).getTime())
+    .filter(ts => !isNaN(ts));
+
+  const lastActivity = allTimestamps.length > 0
+    ? new Date(Math.max(...allTimestamps)).toISOString()
+    : new Date().toISOString();
+
   return {
     name: projectName,
     path: projectPath,
-    sessionFiles: sessionFiles.map(filePath => ({
-      filename: filePath.split(/[/\\]/).pop(), // Cross-platform basename
-      path: filePath
-    })),
-    totalSessions: sessionFiles.length
+    totalSessions: sessions.length,
+    totalCost: Math.round(totalCost * 10000) / 10000,
+    lastActivity,
+    sessions
   };
 }
 

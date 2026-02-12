@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- feat: implement Project List view with search, sort, and project cards (EPIC-3-001)
 - Add comprehensive unit testing with Vitest for back-end utilities (scanner, parser, cost calculator)
 - feat: Add comprehensive error handling layer with consistent error responses, graceful degradation for corrupted files, and structured logging
 - feat: EPIC-2-005 - Add POST /api/refresh endpoint with in-memory caching and cache invalidation

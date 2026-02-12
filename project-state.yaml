@@ -4,29 +4,29 @@
 #
 # Current epic being worked on
 current_epic:
-  id: "EPIC-2" # Leave empty on first run - will be populated from tasks.yaml
-  name: "Backend API & Data Processing" # Auto-populated from tasks.yaml
-  branch_name: "feature/EPIC-2" # Auto-generated as feature/<epic-id>
+  id: "EPIC-3" # Leave empty on first run - will be populated from tasks.yaml
+  name: "Primary UI Views" # Auto-populated from tasks.yaml
+  branch_name: "feature/EPIC-3" # Auto-generated as feature/<epic-id>
   started_at: "2026-02-12T18:01:47Z" # ISO timestamp, auto-populated
   completed_at: null # Set when epic completes
 # Current task being worked on
 
 active_task:
-  type: "documentation" # feature | bugfix | documentation | manual_review
-  id: "KB_UPDATE" # Task identifier (e.g., EPIC-1-001)
+  type: "feature" # feature | bugfix | documentation | manual_review
+  id: "EPIC-3-001" # Task identifier (e.g., EPIC-1-001)
   attempts: 1 # Number of attempts on this task
 # Next task in queue
 
 next_task:
-  type: null # Automatically managed by orchestrator
-  id: null # Automatically managed by orchestrator
+  type: feature # Automatically managed by orchestrator
+  id: EPIC-3-002 # Automatically managed by orchestrator
 # Knowledge base synthesis (set to false to skip KB generation after epic completes)
 
 kb_enabled: true
 # Metrics tracking (automatically managed - do not edit)
 
 metrics:
-  total_tasks_completed: 12
+  total_tasks_completed: 13
   total_duration_seconds: 0
   tasks:
     - task_id: EPIC-1-001
@@ -77,3 +77,7 @@ metrics:
       outcome: success
       duration_seconds: 590
       completed_at: "2026-02-12T20:35:47Z"
+    - task_id: EPIC-3-001
+      outcome: success
+      duration_seconds: 264
+      completed_at: "2026-02-12T21:46:35Z"
