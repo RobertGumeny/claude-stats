@@ -11,7 +11,8 @@ app.use(express.json());
 
 /**
  * GET /api/projects
- * Returns list of all Claude Code projects with their session files
+ * Returns list of all Claude Code projects with aggregated summary data
+ * Each project includes: name, totalSessions, totalCost, lastActivity, and sessions array
  */
 app.get('/api/projects', async (req: Request, res: Response) => {
   try {
@@ -51,6 +52,6 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`Claude Stats API server running on http://localhost:${PORT}`);
   console.log(`Available endpoints:`);
-  console.log(`  - GET /api/projects - List all Claude Code projects`);
+  console.log(`  - GET /api/projects - List all Claude Code projects with aggregated data`);
   console.log(`  - GET /api/health - Health check`);
 });

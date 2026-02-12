@@ -1,6 +1,8 @@
 import { readdir, stat } from 'fs/promises';
 import { join, resolve } from 'path';
 import { homedir } from 'os';
+import { parseJsonlFile } from './parser.js';
+import { calculateMessageCost } from './costCalculator.js';
 
 /**
  * Represents a session file with its metadata
@@ -11,13 +13,30 @@ export interface SessionFile {
 }
 
 /**
- * Represents a project with its session files
+ * Session summary with aggregated data
+ */
+export interface Session {
+  filename: string;
+  sessionId: string;
+  messageCount: number;
+  totalCost: number;
+  sidechainCount: number;
+  sidechainPercentage: number;
+  totalTokens: number;
+  firstMessage: string; // ISO timestamp
+  lastMessage: string; // ISO timestamp
+}
+
+/**
+ * Represents a project with aggregated session data
  */
 export interface Project {
   name: string;
   path: string;
-  sessionFiles: SessionFile[];
   totalSessions: number;
+  totalCost: number;
+  lastActivity: string; // ISO timestamp
+  sessions: Session[];
 }
 
 /**
@@ -89,22 +108,102 @@ async function findJsonlFiles(dirPath: string, fileList: string[] = []): Promise
 }
 
 /**
- * Scan a single project directory and return metadata
+ * Parse a single session file and return aggregated session data
+ * @param filePath - Absolute path to .jsonl file
+ * @returns Session summary with aggregated data, or null on error
+ */
+async function parseSessionFile(filePath: string): Promise<Session | null> {
+  try {
+    const parseResult = await parseJsonlFile(filePath);
+
+    if (!parseResult.success || !parseResult.messages || parseResult.messages.length === 0) {
+      // Skip files that can't be parsed or have no messages
+      return null;
+    }
+
+    const messages = parseResult.messages;
+
+    // Calculate total cost for all messages
+    const totalCost = messages.reduce((sum, msg) => {
+      return sum + calculateMessageCost(msg.usage);
+    }, 0);
+
+    // Count sidechain messages
+    const sidechainCount = messages.filter(msg => msg.isSidechain).length;
+    const sidechainPercentage = messages.length > 0
+      ? Math.round((sidechainCount / messages.length) * 100)
+      : 0;
+
+    // Calculate total tokens
+    const totalTokens = messages.reduce((sum, msg) => {
+      const usage = msg.usage;
+      return sum +
+        (usage.input_tokens || 0) +
+        (usage.cache_creation_input_tokens || 0) +
+        (usage.cache_read_input_tokens || 0) +
+        (usage.output_tokens || 0);
+    }, 0);
+
+    // Get first and last message timestamps
+    const timestamps = messages.map(msg => msg.timestamp).filter(Boolean).sort();
+    const firstMessage = timestamps[0] || new Date().toISOString();
+    const lastMessage = timestamps[timestamps.length - 1] || firstMessage;
+
+    // Extract session ID from first message
+    const sessionId = messages[0]?.sessionId || 'unknown';
+
+    return {
+      filename: filePath.split(/[/\\]/).pop() || '',
+      sessionId,
+      messageCount: messages.length,
+      totalCost: Math.round(totalCost * 10000) / 10000, // Round to 4 decimal places
+      sidechainCount,
+      sidechainPercentage,
+      totalTokens,
+      firstMessage,
+      lastMessage
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.warn(`Warning: Could not parse session file ${filePath}: ${errorMessage}`);
+    return null;
+  }
+}
+
+/**
+ * Scan a single project directory and return aggregated metadata
  * @param projectPath - Path to project directory
  * @param projectName - Name of the project
- * @returns Project metadata with session files
+ * @returns Project metadata with aggregated session data
  */
 async function scanProject(projectPath: string, projectName: string): Promise<Project> {
-  const sessionFiles = await findJsonlFiles(projectPath);
+  const sessionFilePaths = await findJsonlFiles(projectPath);
+
+  // Parse all session files in parallel
+  const sessionPromises = sessionFilePaths.map(filePath => parseSessionFile(filePath));
+  const sessionResults = await Promise.all(sessionPromises);
+
+  // Filter out null results (failed parses)
+  const sessions = sessionResults.filter((session): session is Session => session !== null);
+
+  // Calculate total cost across all sessions
+  const totalCost = sessions.reduce((sum, session) => sum + session.totalCost, 0);
+
+  // Find the most recent activity
+  const allTimestamps = sessions
+    .map(session => session.lastMessage)
+    .filter(Boolean)
+    .sort()
+    .reverse();
+  const lastActivity = allTimestamps[0] || new Date().toISOString();
 
   return {
     name: projectName,
     path: projectPath,
-    sessionFiles: sessionFiles.map(filePath => ({
-      filename: filePath.split(/[/\\]/).pop() || '', // Cross-platform basename
-      path: filePath
-    })),
-    totalSessions: sessionFiles.length
+    totalSessions: sessions.length,
+    totalCost: Math.round(totalCost * 10000) / 10000, // Round to 4 decimal places
+    lastActivity,
+    sessions
   };
 }
 
