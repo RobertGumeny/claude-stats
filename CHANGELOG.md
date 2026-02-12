@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- Implemented GET /api/session-detail/:projectName/:sessionId endpoint that returns full message-level breakdown for a single session with individual message costs
 - Implemented GET /api/sessions/:projectName endpoint that returns all sessions for a specific project with summary statistics
 - Implemented Express server with GET /api/projects endpoint that scans all projects and returns aggregated summary data including totalCost and lastActivity
 - feat(backend): convert all backend code to TypeScript with comprehensive type definitions

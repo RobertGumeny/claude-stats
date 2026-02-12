@@ -28,6 +28,30 @@ export interface Session {
 }
 
 /**
+ * Message with cost calculation for session detail view
+ */
+export interface SessionMessage {
+  messageId: string;
+  timestamp: string;
+  role: string;
+  usage: {
+    input_tokens: number;
+    cache_creation_input_tokens: number;
+    cache_read_input_tokens: number;
+    output_tokens: number;
+  };
+  cost: number;
+  isSidechain: boolean;
+}
+
+/**
+ * Full session detail with message-level breakdown
+ */
+export interface SessionDetail extends Session {
+  messages: SessionMessage[];
+}
+
+/**
  * Represents a project with aggregated session data
  */
 export interface Project {
@@ -296,6 +320,24 @@ export interface ProjectNotFoundResult {
 export type ProjectSessionsScanResult = ProjectSessionsResult | ProjectNotFoundResult;
 
 /**
+ * Result type for session detail retrieval
+ */
+export interface SessionDetailResult {
+  success: true;
+  sessionDetail: SessionDetail;
+  projectName: string;
+}
+
+export interface SessionDetailNotFoundResult {
+  success: false;
+  error: string;
+  projectName: string;
+  sessionId: string;
+}
+
+export type SessionDetailScanResult = SessionDetailResult | SessionDetailNotFoundResult;
+
+/**
  * Get all sessions for a specific project by name
  * @param projectName - Name of the project directory
  * @returns Promise resolving to sessions array or error
@@ -349,6 +391,137 @@ export async function getProjectSessions(projectName: string): Promise<ProjectSe
       success: false,
       error: `Error scanning project '${projectName}': ${errorMessage}`,
       projectName
+    };
+  }
+}
+
+/**
+ * Get full message-level breakdown for a single session
+ * @param projectName - Name of the project directory
+ * @param sessionId - Session ID to retrieve
+ * @returns Promise resolving to session detail with all messages or error
+ */
+export async function getSessionDetail(
+  projectName: string,
+  sessionId: string
+): Promise<SessionDetailScanResult> {
+  const projectsPath = getClaudeProjectsPath();
+  const projectPath = join(projectsPath, projectName);
+
+  try {
+    // Check if the project directory exists
+    const dirStats = await stat(projectPath);
+
+    if (!dirStats.isDirectory()) {
+      return {
+        success: false,
+        error: `Project '${projectName}' exists but is not a directory`,
+        projectName,
+        sessionId
+      };
+    }
+  } catch (error) {
+    // Project directory doesn't exist
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+      return {
+        success: false,
+        error: `Project '${projectName}' not found`,
+        projectName,
+        sessionId
+      };
+    }
+
+    // Other errors (permissions, etc.)
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      error: `Unable to access project '${projectName}': ${errorMessage}`,
+      projectName,
+      sessionId
+    };
+  }
+
+  try {
+    // Find all JSONL files in the project
+    const sessionFilePaths = await findJsonlFiles(projectPath);
+
+    // Try to find the session file by parsing each one
+    for (const filePath of sessionFilePaths) {
+      const parseResult = await parseJsonlFile(filePath);
+
+      if (!parseResult.success || !parseResult.messages || parseResult.messages.length === 0) {
+        continue;
+      }
+
+      // Check if this file contains the target session ID
+      const firstMessage = parseResult.messages[0];
+      if (firstMessage.sessionId === sessionId) {
+        // Found the session! Now build the full detail
+        const messages = parseResult.messages;
+
+        // Calculate cost for each message
+        const sessionMessages: SessionMessage[] = messages.map(msg => ({
+          messageId: msg.messageId,
+          timestamp: msg.timestamp,
+          role: msg.role,
+          usage: msg.usage,
+          cost: calculateMessageCost(msg.usage),
+          isSidechain: msg.isSidechain
+        }));
+
+        // Calculate session summary data
+        const totalCost = sessionMessages.reduce((sum, msg) => sum + msg.cost, 0);
+        const sidechainCount = sessionMessages.filter(msg => msg.isSidechain).length;
+        const sidechainPercentage = sessionMessages.length > 0
+          ? Math.round((sidechainCount / sessionMessages.length) * 100)
+          : 0;
+
+        const totalTokens = messages.reduce((sum, msg) => {
+          const usage = msg.usage;
+          return sum +
+            (usage.input_tokens || 0) +
+            (usage.cache_creation_input_tokens || 0) +
+            (usage.cache_read_input_tokens || 0) +
+            (usage.output_tokens || 0);
+        }, 0);
+
+        const timestamps = messages.map(msg => msg.timestamp).filter(Boolean).sort();
+        const firstMessageTime = timestamps[0] || new Date().toISOString();
+        const lastMessageTime = timestamps[timestamps.length - 1] || firstMessageTime;
+
+        return {
+          success: true,
+          sessionDetail: {
+            filename: filePath.split(/[/\\]/).pop() || '',
+            sessionId,
+            messageCount: sessionMessages.length,
+            totalCost: Math.round(totalCost * 10000) / 10000,
+            sidechainCount,
+            sidechainPercentage,
+            totalTokens,
+            firstMessage: firstMessageTime,
+            lastMessage: lastMessageTime,
+            messages: sessionMessages
+          },
+          projectName
+        };
+      }
+    }
+
+    // Session not found in any file
+    return {
+      success: false,
+      error: `Session '${sessionId}' not found in project '${projectName}'`,
+      projectName,
+      sessionId
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      error: `Error retrieving session detail: ${errorMessage}`,
+      projectName,
+      sessionId
     };
   }
 }
