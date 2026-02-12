@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { scanAllProjects, getProjectSessions, getSessionDetail } from './scanner.js';
+import { scanAllProjects, getProjectSessions, getSessionDetail, clearCache } from './scanner.js';
 
 const app = express();
 const PORT = 3001;
@@ -128,6 +128,49 @@ app.get('/api/session-detail/:projectName/:sessionId', async (req: Request, res:
 });
 
 /**
+ * POST /api/refresh
+ * Triggers re-scan of file system and clears in-memory cache
+ * Returns success status with timestamp of refresh
+ */
+app.post('/api/refresh', async (req: Request, res: Response) => {
+  try {
+    const startTime = Date.now();
+
+    // Clear the cache to force a fresh scan
+    clearCache();
+
+    // Re-scan all projects (with useCache=false to bypass cache)
+    const result = await scanAllProjects(false);
+
+    const duration = Date.now() - startTime;
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        error: result.error,
+        timestamp: new Date().toISOString(),
+        durationMs: duration
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Cache cleared and projects re-scanned successfully',
+      timestamp: new Date().toISOString(),
+      durationMs: duration,
+      projectsScanned: result.metadata.totalProjects
+    });
+  } catch (error) {
+    console.error('Error in /api/refresh:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error while refreshing data',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+/**
  * GET /api/health
  * Simple health check endpoint
  */
@@ -144,5 +187,6 @@ app.listen(PORT, () => {
   console.log(`  - GET /api/projects - List all Claude Code projects with aggregated data`);
   console.log(`  - GET /api/sessions/:projectName - Get all sessions for a specific project`);
   console.log(`  - GET /api/session-detail/:projectName/:sessionId - Get full message breakdown for a session`);
+  console.log(`  - POST /api/refresh - Clear cache and re-scan all projects`);
   console.log(`  - GET /api/health - Health check`);
 });

@@ -14,6 +14,7 @@
     "test:scanner": "node server/test-scanner.js",
     "test:parser": "node server/test-parser.js",
     "test:cost": "node src/utils/test-cost-calculator.js",
+    "test:refresh": "tsx server/test-epic-2-005.ts",
     "validate": "node server/validate-implementation.js"
   },
   "dependencies": {

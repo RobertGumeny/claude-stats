@@ -233,9 +233,15 @@ async function scanProject(projectPath: string, projectName: string): Promise<Pr
 
 /**
  * Scan all projects in the ~/.claude/projects directory
+ * @param useCache - Whether to use cached results if available (default: true)
  * @returns Promise resolving to scan result with projects or error
  */
-export async function scanAllProjects(): Promise<ScanResult> {
+export async function scanAllProjects(useCache: boolean = true): Promise<ScanResult> {
+  // Return cached result if available and caching is enabled
+  if (useCache && cachedScanResult) {
+    return cachedScanResult;
+  }
+
   const projectsPath = getClaudeProjectsPath();
 
   try {
@@ -284,7 +290,7 @@ export async function scanAllProjects(): Promise<ScanResult> {
 
     const duration = Date.now() - startTime;
 
-    return {
+    const result: ScanSuccessResult = {
       success: true,
       projects: projectsWithSessions,
       metadata: {
@@ -293,6 +299,11 @@ export async function scanAllProjects(): Promise<ScanResult> {
         scannedAt: new Date().toISOString()
       }
     };
+
+    // Cache the successful result
+    cachedScanResult = result;
+
+    return result;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
@@ -336,6 +347,19 @@ export interface SessionDetailNotFoundResult {
 }
 
 export type SessionDetailScanResult = SessionDetailResult | SessionDetailNotFoundResult;
+
+/**
+ * In-memory cache for scan results
+ */
+let cachedScanResult: ScanSuccessResult | null = null;
+
+/**
+ * Clear the cached scan results
+ * Used by the refresh endpoint to trigger a fresh scan
+ */
+export function clearCache(): void {
+  cachedScanResult = null;
+}
 
 /**
  * Get all sessions for a specific project by name
