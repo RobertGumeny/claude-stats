@@ -8,9 +8,13 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run server\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
+    "test:scanner": "node server/test-scanner.js",
+    "validate": "node server/validate-implementation.js"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
