@@ -10,6 +10,7 @@
     "server": "node server/index.js",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "test:scanner": "node server/test-scanner.js",
+    "test:parser": "node server/test-parser.js",
     "validate": "node server/validate-implementation.js"
   },
   "dependencies": {
