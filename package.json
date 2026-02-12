@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:server": "tsc -p tsconfig.server.json",
     "preview": "vite preview",
-    "server": "node server/index.js",
+    "server": "tsx server/index.ts",
+    "server:build": "node dist/server/index.js",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "test:scanner": "node server/test-scanner.js",
     "test:parser": "node server/test-parser.js",
@@ -21,6 +23,8 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.3",
@@ -29,6 +33,7 @@
     "concurrently": "^9.1.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^4.1.7",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.2",
     "vite": "^6.0.11"
   }
