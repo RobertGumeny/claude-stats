@@ -84,15 +84,6 @@ export function truncateSessionId(sessionId: string, length: number = 8): string
 }
 
 /**
- * Format cost with 4 decimal places
- * @param cost - Cost in dollars
- * @returns Formatted cost string
- */
-export function formatCost(cost: number): string {
-  return `$${cost.toFixed(4)}`;
-}
-
-/**
  * Format large numbers with commas
  * @param num - Number to format
  * @returns Formatted number string

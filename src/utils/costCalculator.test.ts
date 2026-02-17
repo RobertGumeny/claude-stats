@@ -271,26 +271,26 @@ describe('Cost Calculator', () => {
   });
 
   describe('formatCost', () => {
-    it('should format cost with $ prefix and 4 decimals by default', () => {
-      expect(formatCost(0.0086)).toBe('$0.0086');
-      expect(formatCost(1.2345)).toBe('$1.2345');
-      expect(formatCost(0.0001)).toBe('$0.0001');
+    it('should format cost with $ prefix and 2 decimals by default', () => {
+      expect(formatCost(0.0086)).toBe('$0.01');
+      expect(formatCost(1.2345)).toBe('$1.23');
+      expect(formatCost(0.0001)).toBe('$0.00');
     });
 
     it('should support custom decimal places', () => {
-      expect(formatCost(0.0086, 2)).toBe('$0.01');
+      expect(formatCost(0.0086, 4)).toBe('$0.0086');
       expect(formatCost(1.2345, 3)).toBe('$1.234'); // toFixed truncates, doesn't round
       expect(formatCost(0.123456, 6)).toBe('$0.123456');
     });
 
     it('should handle zero cost', () => {
-      expect(formatCost(0)).toBe('$0.0000');
-      expect(formatCost(0, 2)).toBe('$0.00');
+      expect(formatCost(0)).toBe('$0.00');
+      expect(formatCost(0, 4)).toBe('$0.0000');
     });
 
     it('should handle large costs', () => {
-      expect(formatCost(123.4567)).toBe('$123.4567');
-      expect(formatCost(1000.5)).toBe('$1000.5000');
+      expect(formatCost(123.4567)).toBe('$123.46');
+      expect(formatCost(1000.5)).toBe('$1000.50');
     });
   });
 

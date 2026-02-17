@@ -70,8 +70,8 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
 
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-text-primary">Session Detail</h2>
-        <p className="text-text-secondary text-sm mt-1 font-mono">
+        <h2 className="text-2xl font-bold text-foreground">Session Detail</h2>
+        <p className="text-muted text-sm mt-1 font-mono">
           Session ID: {sessionId}
         </p>
       </div>
@@ -81,17 +81,17 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
         <div className="flex justify-center items-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400 mx-auto mb-4"></div>
-            <p className="text-text-tertiary">Loading session details...</p>
+            <p className="text-subtle">Loading session details...</p>
           </div>
         </div>
       )}
 
       {/* Error State */}
       {!loading && error && (
-        <div className="bg-background-secondary border border-accent-warning rounded-lg p-6">
-          <h3 className="text-accent-warning font-semibold mb-2">Failed to load session</h3>
-          <p className="text-text-secondary">Failed to load session details. Try refreshing the page.</p>
-          <p className="text-text-tertiary text-sm mt-2">
+        <div className="bg-secondary border border-warning rounded-lg p-6">
+          <h3 className="text-warning font-semibold mb-2">Failed to load session</h3>
+          <p className="text-muted">Failed to load session details. Try refreshing the page.</p>
+          <p className="text-subtle text-sm mt-2">
             Make sure the API server is running on port 3001.
           </p>
         </div>
@@ -105,7 +105,7 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
 
           {/* Message Table */}
           <div>
-            <h3 className="text-xl font-semibold text-text-primary mb-4">Messages</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-4">Messages</h3>
             <MessageTable messages={sessionDetail.messages} />
           </div>
         </div>

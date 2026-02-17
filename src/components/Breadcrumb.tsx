@@ -16,21 +16,21 @@ interface BreadcrumbProps {
  */
 export function Breadcrumb({ items }: BreadcrumbProps) {
   return (
-    <nav className="flex items-center space-x-2 text-sm text-text-secondary mb-6">
+    <nav className="flex items-center space-x-2 text-sm text-muted mb-6">
       {items.map((item, index) => (
         <div key={index} className="flex items-center">
           {index > 0 && (
-            <span className="mx-2 text-text-tertiary">/</span>
+            <span className="mx-2 text-subtle">/</span>
           )}
           {item.path ? (
             <Link
               to={item.path}
-              className="hover:text-accent-primary transition-colors"
+              className="hover:text-accent transition-colors"
             >
               {item.label}
             </Link>
           ) : (
-            <span className="text-text-primary font-medium">{item.label}</span>
+            <span className="text-foreground font-medium">{item.label}</span>
           )}
         </div>
       ))}

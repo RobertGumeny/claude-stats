@@ -76,7 +76,7 @@ export function ProjectList({ projects }: ProjectListProps) {
             placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 bg-background-secondary border border-border-primary rounded-lg text-text-primary placeholder-text-tertiary focus:outline-none focus:border-accent-primary transition-colors"
+            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder-subtle focus:outline-none focus:border-accent transition-colors"
           />
         </div>
 
@@ -85,7 +85,7 @@ export function ProjectList({ projects }: ProjectListProps) {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="w-full px-4 py-2 bg-background-secondary border border-border-primary rounded-lg text-text-primary focus:outline-none focus:border-accent-primary transition-colors cursor-pointer"
+            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:border-accent transition-colors cursor-pointer"
           >
             <option value="cost">Most Expensive</option>
             <option value="recent">Most Recent</option>
@@ -97,17 +97,17 @@ export function ProjectList({ projects }: ProjectListProps) {
 
       {/* Project Cards Grid */}
       {sortedProjects.length === 0 ? (
-        <div className="bg-background-secondary border border-border-primary rounded-lg p-12 text-center">
-          <div className="inline-block mb-4 text-text-tertiary">
+        <div className="bg-secondary border border-border rounded-lg p-12 text-center">
+          <div className="inline-block mb-4 text-subtle">
             <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
           </div>
-          <p className="text-text-tertiary text-lg">
+          <p className="text-subtle text-lg">
             {searchQuery ? 'No projects match your search' : 'No projects found'}
           </p>
           {!searchQuery && (
-            <p className="text-text-tertiary text-sm mt-2">
+            <p className="text-subtle text-sm mt-2">
               No Claude Code projects detected. Start a session to see it here.
             </p>
           )}
