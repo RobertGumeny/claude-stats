@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- Added inline token visualization bar chart with color-coded segments and hover tooltip to the message table
 - Added copy-to-clipboard functionality for session IDs, message IDs, and message content with checkmark feedback
 - Added filter controls to Session Detail view: Main Thread/Sidechain toggle and User/Assistant role checkboxes with instant filtering
 - feat: Add loading states (spinners), empty states, and error states for all views with friendly messaging

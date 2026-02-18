@@ -3,6 +3,7 @@ import { Message } from "../types";
 import { formatNumber } from "../utils/formatters";
 import { formatCost } from "../utils/costCalculator";
 import { CopyButton } from "./CopyButton";
+import { TokenBar } from "./TokenBar";
 
 interface MessageTableProps {
   messages: Message[];
@@ -75,7 +76,10 @@ function MessageRow({ message, isExpanded, onToggle }: MessageRowProps) {
 
         {/* Tokens */}
         <td className="px-4 py-3 text-foreground text-sm font-mono">
-          {formatNumber(totalTokens)}
+          <div className="flex items-center gap-2">
+            <span>{formatNumber(totalTokens)}</span>
+            {message.usage && <TokenBar usage={message.usage} />}
+          </div>
         </td>
 
         {/* Cost */}
