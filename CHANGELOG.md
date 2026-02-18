@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](0.1.0) YYYY-MM-DD
 
 ### Added
+- Added filter controls to Session Detail view: Main Thread/Sidechain toggle and User/Assistant role checkboxes with instant filtering
 - feat: Add loading states (spinners), empty states, and error states for all views with friendly messaging
 - feat: EPIC-3-004 - Implement React Router navigation with breadcrumbs and URL state preservation
 - feat(ui): implement SessionDetail view with summary card, message table, and expandable rows

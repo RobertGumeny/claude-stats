@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { SessionDetail as SessionDetailType } from '../types';
+import { useState, useEffect, useMemo } from 'react';
+import { SessionDetail as SessionDetailType, Message } from '../types';
 import { SummaryCard } from './SummaryCard';
 import { MessageTable } from './MessageTable';
 import { truncateSessionId } from '../utils/formatters';
@@ -12,10 +12,38 @@ interface SessionDetailProps {
 
 const API_BASE_URL = 'http://localhost:3001';
 
+type ThreadFilter = 'all' | 'main' | 'sidechain';
+
+export function applyFilters(
+  messages: Message[],
+  threadFilter: ThreadFilter,
+  showUser: boolean,
+  showAssistant: boolean
+): Message[] {
+  return messages.filter((msg) => {
+    if (threadFilter === 'main' && msg.isSidechain) return false;
+    if (threadFilter === 'sidechain' && !msg.isSidechain) return false;
+    if (!showUser && msg.role === 'user') return false;
+    if (!showAssistant && msg.role === 'assistant') return false;
+    return true;
+  });
+}
+
 export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
   const [sessionDetail, setSessionDetail] = useState<SessionDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Filter state
+  const [threadFilter, setThreadFilter] = useState<ThreadFilter>('all');
+  const [showUser, setShowUser] = useState(true);
+  const [showAssistant, setShowAssistant] = useState(true);
+
+  // Filtered messages — computed instantly, no async work needed
+  const filteredMessages = useMemo(() => {
+    if (!sessionDetail) return [];
+    return applyFilters(sessionDetail.messages, threadFilter, showUser, showAssistant);
+  }, [sessionDetail, threadFilter, showUser, showAssistant]);
 
   // Fetch session detail from API
   useEffect(() => {
@@ -103,10 +131,62 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
           {/* Summary Card */}
           <SummaryCard session={sessionDetail} />
 
+          {/* Filter Controls */}
+          <div className="bg-secondary border border-border rounded-lg p-4">
+            <div className="flex flex-wrap gap-4 items-center">
+              {/* Thread filter — mutually exclusive toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-subtle text-xs uppercase tracking-wider font-semibold mr-1">Thread:</span>
+                {(['all', 'main', 'sidechain'] as ThreadFilter[]).map((value) => (
+                  <button
+                    key={value}
+                    onClick={() => setThreadFilter(value)}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      threadFilter === value
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-tertiary text-muted hover:text-foreground hover:bg-zinc-600'
+                    }`}
+                  >
+                    {value === 'all' ? 'All' : value === 'main' ? 'Main Thread' : 'Sidechain'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div className="w-px h-6 bg-border" />
+
+              {/* Role filters — independent checkboxes */}
+              <div className="flex items-center gap-3">
+                <span className="text-subtle text-xs uppercase tracking-wider font-semibold mr-1">Role:</span>
+                <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={showUser}
+                    onChange={(e) => setShowUser(e.target.checked)}
+                    className="accent-blue-500"
+                  />
+                  <span className="text-sm text-muted">Show User</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={showAssistant}
+                    onChange={(e) => setShowAssistant(e.target.checked)}
+                    className="accent-blue-500"
+                  />
+                  <span className="text-sm text-muted">Show Assistant</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
           {/* Message Table */}
           <div>
             <h3 className="text-xl font-semibold text-foreground mb-4">Messages</h3>
-            <MessageTable messages={sessionDetail.messages} />
+            <MessageTable
+              messages={filteredMessages}
+              totalMessages={sessionDetail.messages.length}
+            />
           </div>
         </div>
       )}

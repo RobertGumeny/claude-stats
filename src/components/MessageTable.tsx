@@ -5,6 +5,7 @@ import { formatCost } from "../utils/costCalculator";
 
 interface MessageTableProps {
   messages: Message[];
+  totalMessages?: number;
 }
 
 /**
@@ -162,7 +163,7 @@ function MessageRow({ message, isExpanded, onToggle }: MessageRowProps) {
   );
 }
 
-export function MessageTable({ messages }: MessageTableProps) {
+export function MessageTable({ messages, totalMessages }: MessageTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleRow = (messageId: string) => {
@@ -227,8 +228,9 @@ export function MessageTable({ messages }: MessageTableProps) {
       {/* Table footer with message count */}
       <div className="bg-tertiary border-t border-border px-4 py-3">
         <p className="text-subtle text-sm">
-          Showing {formatNumber(messages.length)} message
-          {messages.length !== 1 ? "s" : ""}
+          {totalMessages !== undefined && totalMessages !== messages.length
+            ? `Showing ${formatNumber(messages.length)} of ${formatNumber(totalMessages)} message${totalMessages !== 1 ? 's' : ''}`
+            : `Showing ${formatNumber(messages.length)} message${messages.length !== 1 ? 's' : ''}`}
         </p>
       </div>
     </div>
