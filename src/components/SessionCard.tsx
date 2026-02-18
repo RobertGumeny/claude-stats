@@ -1,6 +1,7 @@
 import { Session } from '../types';
 import { formatTimestampRange, truncateSessionId, formatNumber } from '../utils/formatters';
 import { formatCost } from '../utils/costCalculator';
+import { CopyButton } from './CopyButton';
 
 interface SessionCardProps {
   session: Session;
@@ -27,6 +28,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
           </h3>
           <div className="flex items-center gap-2 text-sm text-subtle font-mono">
             <span className="truncate">ID: {truncateSessionId(session.sessionId)}</span>
+            <CopyButton text={session.sessionId} label="Session ID" />
           </div>
         </div>
 

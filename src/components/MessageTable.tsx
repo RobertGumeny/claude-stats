@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Message } from "../types";
 import { formatNumber } from "../utils/formatters";
 import { formatCost } from "../utils/costCalculator";
+import { CopyButton } from "./CopyButton";
 
 interface MessageTableProps {
   messages: Message[];
@@ -95,7 +96,10 @@ function MessageRow({ message, isExpanded, onToggle }: MessageRowProps) {
             <div className="space-y-3">
               {/* Message ID */}
               <div>
-                <p className="text-subtle text-xs mb-1">Message ID</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-subtle text-xs">Message ID</p>
+                  <CopyButton text={message.messageId} label="ID" />
+                </div>
                 <p className="text-foreground text-sm font-mono break-all">
                   {message.messageId}
                 </p>
@@ -144,9 +148,15 @@ function MessageRow({ message, isExpanded, onToggle }: MessageRowProps) {
 
               {/* Message Content */}
               <div>
-                <p className="text-subtle text-xs mb-1">
-                  Content Preview
-                </p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-subtle text-xs">Content Preview</p>
+                  {message.content && (
+                    <CopyButton
+                      text={JSON.stringify(message.content, null, 2)}
+                      label="Content"
+                    />
+                  )}
+                </div>
                 <div className="bg-primary border border-border rounded p-3 max-h-96 overflow-y-auto">
                   <pre className="text-muted text-xs whitespace-pre-wrap wrap-break-word font-mono">
                     {message.content

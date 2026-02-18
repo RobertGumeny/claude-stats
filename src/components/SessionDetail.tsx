@@ -4,6 +4,7 @@ import { SummaryCard } from './SummaryCard';
 import { MessageTable } from './MessageTable';
 import { truncateSessionId } from '../utils/formatters';
 import { Breadcrumb } from './Breadcrumb';
+import { CopyButton } from './CopyButton';
 
 interface SessionDetailProps {
   projectName: string;
@@ -99,9 +100,12 @@ export function SessionDetail({ projectName, sessionId }: SessionDetailProps) {
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-foreground">Session Detail</h2>
-        <p className="text-muted text-sm mt-1 font-mono">
-          Session ID: {sessionId}
-        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-muted text-sm font-mono">
+            Session ID: {sessionId}
+          </p>
+          <CopyButton text={sessionId} label="Session ID" />
+        </div>
       </div>
 
       {/* Loading State */}
