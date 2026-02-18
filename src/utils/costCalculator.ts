@@ -12,11 +12,11 @@
  * All values are in USD per million tokens
  */
 export const PRICING = {
-  input: 3.0,           // Standard input tokens
-  cacheWrite: 3.75,     // Cache creation tokens
-  cacheRead5m: 0.30,    // 5-minute cache tier (default assumption)
-  cacheRead1h: 0.15,    // 1-hour cache tier (future enhancement)
-  output: 15.0,         // Generated output tokens
+  input: 3.0, // Standard input tokens
+  cacheWrite: 3.75, // Cache creation tokens
+  cacheRead5m: 0.3, // 5-minute cache tier (default assumption)
+  cacheRead1h: 0.15, // 1-hour cache tier (future enhancement)
+  output: 15.0, // Generated output tokens
 } as const;
 
 /**
@@ -33,7 +33,7 @@ export interface TokenUsage {
  * Extended token usage with cache tier information
  */
 export interface TokenUsageWithTier extends TokenUsage {
-  cache_tier?: '5m' | '1h';  // Cache tier (defaults to 5m)
+  cache_tier?: "5m" | "1h"; // Cache tier (defaults to 5m)
 }
 
 /**
@@ -55,10 +55,12 @@ export interface TokenUsageWithTier extends TokenUsage {
  * const cost = calculateMessageCost(usage);
  * // Returns: 0.0086
  */
-export function calculateMessageCost(usage: TokenUsage | null | undefined): number {
+export function calculateMessageCost(
+  usage: TokenUsage | null | undefined,
+): number {
   // Handle missing or null usage object
   if (!usage) {
-    return 0.0000;
+    return 0.0;
   }
 
   // Extract token counts, defaulting to 0 for missing fields
@@ -68,17 +70,18 @@ export function calculateMessageCost(usage: TokenUsage | null | undefined): numb
   const outputTokens = Math.max(0, usage.output_tokens || 0);
 
   // Determine cache tier pricing (default to 5-minute tier)
-  const cacheTier = (usage as TokenUsageWithTier).cache_tier || '5m';
-  const cacheReadPrice = cacheTier === '1h' ? PRICING.cacheRead1h : PRICING.cacheRead5m;
+  const cacheTier = (usage as TokenUsageWithTier).cache_tier || "5m";
+  const cacheReadPrice =
+    cacheTier === "1h" ? PRICING.cacheRead1h : PRICING.cacheRead5m;
 
   // Calculate total cost
   // (input × $3.00 + cache_write × $3.75 + cache_read × $0.30 + output × $15.00) / 1M
-  const totalCost = (
-    (inputTokens * PRICING.input) +
-    (cacheWriteTokens * PRICING.cacheWrite) +
-    (cacheReadTokens * cacheReadPrice) +
-    (outputTokens * PRICING.output)
-  ) / 1_000_000;
+  const totalCost =
+    (inputTokens * PRICING.input +
+      cacheWriteTokens * PRICING.cacheWrite +
+      cacheReadTokens * cacheReadPrice +
+      outputTokens * PRICING.output) /
+    1_000_000;
 
   // Round to 4 decimal places
   return Math.round(totalCost * 10000) / 10000;
@@ -99,7 +102,7 @@ export function calculateMessageCost(usage: TokenUsage | null | undefined): numb
  */
 export function calculateTotalCost(messages: TokenUsage[]): number {
   if (!messages || messages.length === 0) {
-    return 0.0000;
+    return 0.0;
   }
 
   const total = messages.reduce((sum, usage) => {
@@ -136,11 +139,11 @@ export function calculateCostBreakdown(usage: TokenUsage | null | undefined): {
 } {
   if (!usage) {
     return {
-      input: 0.0000,
-      cacheWrite: 0.0000,
-      cacheRead: 0.0000,
-      output: 0.0000,
-      total: 0.0000,
+      input: 0.0,
+      cacheWrite: 0.0,
+      cacheRead: 0.0,
+      output: 0.0,
+      total: 0.0,
     };
   }
 
@@ -149,8 +152,9 @@ export function calculateCostBreakdown(usage: TokenUsage | null | undefined): {
   const cacheReadTokens = Math.max(0, usage.cache_read_input_tokens || 0);
   const outputTokens = Math.max(0, usage.output_tokens || 0);
 
-  const cacheTier = (usage as TokenUsageWithTier).cache_tier || '5m';
-  const cacheReadPrice = cacheTier === '1h' ? PRICING.cacheRead1h : PRICING.cacheRead5m;
+  const cacheTier = (usage as TokenUsageWithTier).cache_tier || "5m";
+  const cacheReadPrice =
+    cacheTier === "1h" ? PRICING.cacheRead1h : PRICING.cacheRead5m;
 
   const inputCost = (inputTokens * PRICING.input) / 1_000_000;
   const cacheWriteCost = (cacheWriteTokens * PRICING.cacheWrite) / 1_000_000;
@@ -162,7 +166,10 @@ export function calculateCostBreakdown(usage: TokenUsage | null | undefined): {
     cacheWrite: Math.round(cacheWriteCost * 10000) / 10000,
     cacheRead: Math.round(cacheReadCost * 10000) / 10000,
     output: Math.round(outputCost * 10000) / 10000,
-    total: Math.round((inputCost + cacheWriteCost + cacheReadCost + outputCost) * 10000) / 10000,
+    total:
+      Math.round(
+        (inputCost + cacheWriteCost + cacheReadCost + outputCost) * 10000,
+      ) / 10000,
   };
 }
 
@@ -170,14 +177,14 @@ export function calculateCostBreakdown(usage: TokenUsage | null | undefined): {
  * Format cost as currency string
  *
  * @param cost - Cost in USD
- * @param decimals - Number of decimal places (default: 4)
- * @returns Formatted cost string (e.g., "$0.0086")
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted cost string (e.g., "$0.01")
  *
  * @example
- * formatCost(0.0086);    // "$0.0086"
- * formatCost(1.2345);    // "$1.2345"
+ * formatCost(0.0086);    // "$0.01"
+ * formatCost(1.2345);    // "$1.23"
  * formatCost(0.0001, 4); // "$0.0001"
  */
-export function formatCost(cost: number, decimals: number = 4): string {
+export function formatCost(cost: number, decimals: number = 2): string {
   return `$${cost.toFixed(decimals)}`;
 }

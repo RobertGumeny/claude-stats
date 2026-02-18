@@ -4,6 +4,7 @@
  */
 
 import type { Project, Session, Message } from '../types';
+import { formatCost } from '../utils/costCalculator';
 
 interface Props {
   project?: Project;
@@ -18,21 +19,21 @@ export function TypeTest({ project, session, message }: Props) {
         <div>
           <h2>{project.name}</h2>
           <p>Sessions: {project.totalSessions}</p>
-          <p>Cost: ${project.totalCost.toFixed(4)}</p>
+          <p>Cost: {formatCost(project.totalCost)}</p>
         </div>
       )}
       {session && (
         <div>
           <h3>{session.filename}</h3>
           <p>Messages: {session.messageCount}</p>
-          <p>Cost: ${session.totalCost.toFixed(4)}</p>
+          <p>Cost: {formatCost(session.totalCost)}</p>
         </div>
       )}
       {message && (
         <div>
           <p>Role: {message.role}</p>
           <p>Model: {message.model}</p>
-          <p>Cost: ${message.cost.toFixed(4)}</p>
+          <p>Cost: {formatCost(message.cost)}</p>
         </div>
       )}
     </div>

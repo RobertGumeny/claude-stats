@@ -8,6 +8,9 @@ related_articles:
   - docs/kb/patterns/in-memory-caching.md
   - docs/kb/patterns/graceful-error-handling.md
   - docs/kb/features/filesystem-scanner.md
+  - docs/kb/features/project-list-view.md
+  - docs/kb/features/session-list-view.md
+  - docs/kb/features/session-detail-view.md
 ---
 
 # REST API Endpoints
@@ -141,3 +144,6 @@ await fetch('http://localhost:3001/api/refresh', { method: 'POST' });
 - See [In-Memory Caching](../patterns/in-memory-caching.md) for cache implementation details
 - See [Graceful Error Handling](../patterns/graceful-error-handling.md) for error middleware
 - See [Filesystem Scanner](../features/filesystem-scanner.md) for underlying scan logic
+- See [Project List View](project-list-view.md) for /api/projects consumer
+- See [Session List View](session-list-view.md) for /api/sessions consumer
+- See [Session Detail View](session-detail-view.md) for /api/session-detail consumer

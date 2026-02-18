@@ -19,8 +19,8 @@ A filesystem scanner that recursively discovers all `.jsonl` session files in th
 
 ## Implementation
 
-**Core Scanning Functions (server/scanner.js):**
-```javascript
+**Core Scanning Functions (server/scanner.ts):**
+```typescript
 function getClaudeProjectsPath() {
   return path.join(os.homedir(), '.claude', 'projects');
 }

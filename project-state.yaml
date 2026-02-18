@@ -4,9 +4,9 @@
 #
 # Current epic being worked on
 current_epic:
-  id: "EPIC-2" # Leave empty on first run - will be populated from tasks.yaml
-  name: "Backend API & Data Processing" # Auto-populated from tasks.yaml
-  branch_name: "feature/EPIC-2" # Auto-generated as feature/<epic-id>
+  id: "EPIC-3" # Leave empty on first run - will be populated from tasks.yaml
+  name: "Primary UI Views" # Auto-populated from tasks.yaml
+  branch_name: "feature/EPIC-3" # Auto-generated as feature/<epic-id>
   started_at: "2026-02-12T18:01:47Z" # ISO timestamp, auto-populated
   completed_at: null # Set when epic completes
 # Current task being worked on
@@ -26,7 +26,7 @@ kb_enabled: true
 # Metrics tracking (automatically managed - do not edit)
 
 metrics:
-  total_tasks_completed: 12
+  total_tasks_completed: 17
   total_duration_seconds: 0
   tasks:
     - task_id: EPIC-1-001
@@ -77,3 +77,23 @@ metrics:
       outcome: success
       duration_seconds: 590
       completed_at: "2026-02-12T20:35:47Z"
+    - task_id: EPIC-3-001
+      outcome: success
+      duration_seconds: 264
+      completed_at: "2026-02-12T21:46:35Z"
+    - task_id: EPIC-3-002
+      outcome: success
+      duration_seconds: 236
+      completed_at: "2026-02-12T21:50:41Z"
+    - task_id: EPIC-3-003
+      outcome: success
+      duration_seconds: 343
+      completed_at: "2026-02-12T21:56:34Z"
+    - task_id: EPIC-3-004
+      outcome: success
+      duration_seconds: 259
+      completed_at: "2026-02-12T22:01:04Z"
+    - task_id: EPIC-3-005
+      outcome: success
+      duration_seconds: 168
+      completed_at: "2026-02-12T22:04:02Z"

@@ -39,7 +39,7 @@ Parse a complete JSONL file with detailed error reporting.
 
 **Example:**
 
-```javascript
+```typescript
 import { parseJsonlFile } from './parser.js';
 
 const result = await parseJsonlFile('/path/to/session.jsonl');
@@ -67,7 +67,7 @@ Convenience function that returns only the messages array.
 
 **Example:**
 
-```javascript
+```typescript
 import { parseJsonlFileSimple } from './parser.js';
 
 const messages = await parseJsonlFileSimple('/path/to/session.jsonl');
@@ -85,7 +85,7 @@ Parse multiple JSONL files in parallel.
 
 **Example:**
 
-```javascript
+```typescript
 import { parseMultipleFiles } from './parser.js';
 
 const files = [
@@ -179,7 +179,7 @@ The test suite validates:
 
 Using the parser with the scanner:
 
-```javascript
+```typescript
 import { scanAllProjects } from './scanner.js';
 import { parseJsonlFile } from './parser.js';
 
