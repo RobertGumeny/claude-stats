@@ -1,6 +1,8 @@
 import { Project } from '../types';
 import { ProjectList } from './ProjectList';
 import { formatCost } from '../utils/costCalculator';
+import { RefreshButton } from './RefreshButton';
+import { useRefresh } from '../hooks/useRefresh';
 
 interface ProjectListPageProps {
   projects: Project[];
@@ -11,6 +13,14 @@ interface ProjectListPageProps {
 }
 
 export function ProjectListPage({ projects, loading, error, totalCost, onRefresh }: ProjectListPageProps) {
+  const { isRefreshing, refresh } = useRefresh({ onSuccess: onRefresh });
+
+  const handleRefresh = () => {
+    refresh();
+  };
+
+  const isLoading = loading || isRefreshing;
+
   return (
     <div className="min-h-screen bg-primary text-foreground">
       <div className="container mx-auto px-4 py-8">
@@ -24,22 +34,17 @@ export function ProjectListPage({ projects, loading, error, totalCost, onRefresh
                 Analyze your Claude Code sessions, track costs, and optimize your AI-assisted workflows
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-subtle text-sm">Total Cost</p>
-              <p className="text-success text-3xl font-bold">
-                {formatCost(totalCost)}
-              </p>
+            <div className="flex flex-col items-end gap-3">
+              <div className="text-right">
+                <p className="text-subtle text-sm">Total Cost</p>
+                <p className="text-success text-3xl font-bold">
+                  {formatCost(totalCost)}
+                </p>
+              </div>
+              {/* Refresh Button in header */}
+              <RefreshButton onClick={handleRefresh} isRefreshing={isLoading} />
             </div>
           </div>
-
-          {/* Refresh Button */}
-          <button
-            onClick={onRefresh}
-            disabled={loading}
-            className="mt-4 px-4 py-2 bg-accent text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Scanning...' : 'Refresh Projects'}
-          </button>
         </header>
 
         <main>
