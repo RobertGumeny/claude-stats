@@ -23,11 +23,13 @@
     "validate": "node server/validate-implementation.js"
   },
   "dependencies": {
+    "@types/react-window": "^1.8.8",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "react-window": "^2.2.7"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",

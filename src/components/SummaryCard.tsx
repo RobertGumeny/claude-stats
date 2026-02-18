@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { SessionDetail } from '../types';
 import { formatNumber } from '../utils/formatters';
 import { formatCost } from '../utils/costCalculator';
@@ -84,9 +85,12 @@ function calculateTokenStats(session: SessionDetail) {
 }
 
 export function SummaryCard({ session }: SummaryCardProps) {
-  const cacheHitRate = calculateCacheHitRate(session);
-  const duration = calculateDuration(session.firstMessage, session.lastMessage);
-  const tokenStats = calculateTokenStats(session);
+  const cacheHitRate = useMemo(() => calculateCacheHitRate(session), [session]);
+  const duration = useMemo(
+    () => calculateDuration(session.firstMessage, session.lastMessage),
+    [session.firstMessage, session.lastMessage],
+  );
+  const tokenStats = useMemo(() => calculateTokenStats(session), [session]);
 
   const mainThreadCount = session.messageCount - session.sidechainCount;
 
