@@ -1,11 +1,12 @@
 ---
 title: Expandable UI Components
-updated: 2026-02-12
+updated: 2026-02-18
 category: Patterns
 tags: [react, ui-patterns, state-management, expandable-rows]
 related_articles:
   - docs/kb/features/session-detail-view.md
   - docs/kb/dependencies/react-19.md
+  - docs/kb/dependencies/react-window.md
 ---
 
 # Expandable UI Components
@@ -97,7 +98,7 @@ const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
 ## Edge Cases & Gotchas
 
-- **Performance**: Expanding many rows (50+) at once can impact render performance. Consider limiting max expanded rows or adding virtualization for large tables.
+- **Performance**: Expanding many rows (50+) at once can impact render performance. For tables ≥200 rows, react-window virtualization is used — but row height caching must be invalidated on expand/collapse (key `useDynamicRowHeight` on `expandedRows.size`).
 
 - **State Reset**: Expanded state resets on navigation away and back. For persistent expansion, consider using URL query parameters.
 
@@ -109,3 +110,4 @@ const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
 - See [Session Detail View](../features/session-detail-view.md) for production usage
 - See [React 19](../dependencies/react-19.md) for useState hook
+- See [react-window](../dependencies/react-window.md) for virtualization of large expandable lists
