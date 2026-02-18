@@ -8,8 +8,8 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
 
